@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/activity_sign_up"
+    tools:context=".sign_up">
+
+    <FrameLayout android:id="@+id/frame_lay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        ></FrameLayout>
+
+
+
+    <CheckBox android:id="@+id/privacy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="20dp"
+        android:textSize="20dp"
+        android:text="개인정보 취급 정책 동의"
+        android:buttonTint="#5BFFB0"
+        >
+    </CheckBox>
+
+    <WebView android:id="@+id/privacy_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/privacy"
+        android:text="자세히"
+        android:layout_marginTop="23dp"
+        android:layout_marginLeft="20dp"
+        ></WebView>
+
+    <CheckBox android:id="@+id/rental"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/privacy"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10dp"
+        android:text="대여 약관 동의"
+        android:textSize="20dp"
+        android:buttonTint="#5BFFB0"
+        ></CheckBox>
+
+    <WebView android:id="@+id/rental_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/rental"
+        android:layout_below="@id/privacy"
+        android:layout_marginTop="13dp"
+        android:layout_marginLeft="98dp"
+        android:text="자세히"
+        ></WebView>
+
+    <CheckBox android:id="@+id/service"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rental"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10dp"
+        android:text="서비스 이용약관 동의"
+        android:textSize="20dp"
+        android:buttonTint="#5BFFB0"
+        ></CheckBox>
+
+    <WebView android:id="@+id/service_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rental_detail"
+        android:layout_toRightOf="@id/service"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="43dp"
+        android:text="자세히"
+        ></WebView>
+
+    <Button android:id="@+id/next_bt"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:text="다음"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ></Button>
+
+</RelativeLayout>

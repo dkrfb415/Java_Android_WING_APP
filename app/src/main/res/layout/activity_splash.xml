@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SplashActivity">
+
+    <ImageView android:id="@+id/splash_img"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/logo"
+        android:layout_marginTop="180dp"
+        ></ImageView>
+
+    <TextView android:id="@+id/app_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/splash_img"
+        android:layout_marginTop="80dp"
+        android:text="WING 접속을 환영합니다."
+        android:textColor="@color/colorPrimary"
+        android:textSize="20dp"
+        ></TextView>
+
+    <ProgressBar android:id="@+id/progress_bar"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/app_name"
+        android:layout_marginTop="100dp"
+        ></ProgressBar>
+
+
+</RelativeLayout>
