@@ -8,10 +8,18 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.sip.SipSession;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +28,28 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class sign_up extends AppCompatActivity {
 
@@ -31,7 +59,6 @@ public class sign_up extends AppCompatActivity {
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
 
-    Intent login_intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +77,11 @@ public class sign_up extends AppCompatActivity {
 
     }
 
+
+
+
     // 약관 동의 후 프래그먼트 클래스
-    public static class MenuFragment extends Fragment {
+    public static class MenuFragment extends Fragment   {
 
         SharedPreferences pref;
         sign_up sign_up;
@@ -59,9 +89,11 @@ public class sign_up extends AppCompatActivity {
         CheckBox sign_chk_male;
         CheckBox sign_chk_female;
         String id, password, name, birth, phone, gender, email;
+        RelativeLayout sign_Relative;
 
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+
         }
 
         @Override
@@ -81,9 +113,10 @@ public class sign_up extends AppCompatActivity {
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
             ViewGroup rootview = (ViewGroup)inflater.inflate(R.layout.sign_fragment, container, false);
+            sign_Relative = (RelativeLayout) rootview.findViewById(R.id.sign_relative);
             sign_chk_male = (CheckBox) rootview.findViewById(R.id.sign_chk_male);
             sign_chk_female = (CheckBox)rootview.findViewById(R.id.sign_chk_female);
-            Button sign_join_bt = (Button) rootview.findViewById(R.id.sign_join_bt);
+            final Button sign_join_bt = (Button) rootview.findViewById(R.id.sign_join_bt);
 
             sign_name = (EditText)rootview.findViewById(R.id.sign_name);
             sign_id = (EditText)rootview.findViewById(R.id.sign_id);
@@ -92,18 +125,13 @@ public class sign_up extends AppCompatActivity {
             sign_phone = (EditText)rootview.findViewById(R.id.sign_phone);
             sign_birth = (EditText)rootview.findViewById(R.id.sign_birth);
 
-            id = sign_id.getText().toString();
-            password = sign_pwd.getText().toString();
-            email = sign_email.getText().toString();
-            name = sign_name.getText().toString();
-            phone = sign_phone.getText().toString();
-            birth = sign_birth.getText().toString();
+            sign_id.setMovementMethod(new ScrollingMovementMethod());
 
             sign_chk_male.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     sign_chk_female.setChecked(false);
-                    Toast.makeText(sign_up.getApplicationContext(),"남",Toast.LENGTH_SHORT).show();
+                    gender = "male";
                 }
             });
 
@@ -111,7 +139,7 @@ public class sign_up extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     sign_chk_male.setChecked(false);
-                    Toast.makeText(sign_up.getApplicationContext(),"여",Toast.LENGTH_SHORT).show();
+                    gender = "female";
 
                 }
             });
@@ -119,14 +147,34 @@ public class sign_up extends AppCompatActivity {
             sign_join_bt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-    //                if(id != null && password != null && name != null && email != null && phone != null && birth != null) {
-     //                 if(sign_chk_male.isChecked() || sign_chk_female.isChecked()) {
-                    sign_up.onFragmentChange(1);
-      //                  }
-       //            }
-        //            else {
-         //              Toast.makeText(sign_up.getApplicationContext(), "선택 또는 작성하지 않는 내용이 있습니다.",Toast.LENGTH_SHORT).show();
-          //         }
+                    id = sign_id.getText().toString();
+                    password = sign_pwd.getText().toString();
+                    name = sign_name.getText().toString();
+                    phone = sign_phone.getText().toString();
+                    birth = sign_birth.getText().toString();
+                    email = sign_email.getText().toString();
+
+                    Response.Listener<String> responseListener = new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String result) {
+                                    try {
+                                        JSONObject jasonObject = new JSONObject(result);
+                                        if (result.indexOf("true") != -1) {
+                                            Toast.makeText(sign_up.getApplicationContext(), "회원 등록 성공", Toast.LENGTH_SHORT).show();
+                                            sign_up.onFragmentChange(1);
+                                        } else {
+                                            Toast.makeText(sign_up.getApplicationContext(), "회원 등록 실패", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                        }
+                    };
+                    RegisterRequest registerRequest = new RegisterRequest(id, password, name, birth, phone, gender, email, responseListener);
+                    RequestQueue queue = Volley.newRequestQueue(sign_up);
+                    queue.add(registerRequest);
                 }
             });
             return rootview;
@@ -138,7 +186,6 @@ public class sign_up extends AppCompatActivity {
     public static class MainFragment extends Fragment {
 
         sign_up sign_up;
-
 
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -194,6 +241,9 @@ public class sign_up extends AppCompatActivity {
            next_bt.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
+
+
+
                    if(privarcy.isChecked() && rental.isChecked() && service.isChecked()) {
                        sign_up.onFragmentChange(0);
                    }
@@ -207,7 +257,33 @@ public class sign_up extends AppCompatActivity {
         }
     }
 
+    public static class RegisterRequest extends StringRequest {
+
+        //서버 url 설정(php파일 연동)
+        final static  private String URL="http://54.180.121.142/app/login/joinus/";
+        private Map<String,String>map;
+
+        public RegisterRequest(String id, String password, String name, String birth, String phone, String gender, String email, Response.Listener<String>listener){
+            super(Method.POST,URL,listener,null);//위 url에 post방식으로 값을 전송
+
+            map=new HashMap<>();
+            map.put("id",id);
+            map.put("password",password);
+            map.put("name",name);
+            map.put("birth",birth);
+            map.put("phone",phone);
+            map.put("gender",gender);
+            map.put("email",email);
+        }
+
+        @Override
+        protected Map<String, String> getParams() throws AuthFailureError {
+            return map;
+        }
+    }
+
     public void onFragmentChange(int index)  {
+        Intent login_intent;
         login_intent = new Intent(this, LoginActivity.class);
         if(index == 0) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_main,fragment2).commit();
@@ -216,5 +292,24 @@ public class sign_up extends AppCompatActivity {
             startActivity(login_intent);
             finish();
         }
+    }
+
+    public class ValidateRequest extends StringRequest {
+        //서버 url 설정(php파일 연동)
+        final static private String URL = "http://54.180.121.142/app/login/joinus/";
+        private Map<String, String> map;
+
+        public ValidateRequest(String userID, Response.Listener<String> listener) {
+            super(Request.Method.POST, URL, listener, null);
+
+            map = new HashMap<>();
+            map.put("userID", userID);
+        }
+
+        @Override
+        protected Map<String, String> getParams() throws AuthFailureError {
+            return map;
+        }
+
     }
 }

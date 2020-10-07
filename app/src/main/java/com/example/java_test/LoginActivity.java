@@ -2,13 +2,21 @@ package com.example.java_test;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageInstaller;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.media.MediaSession2;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.renderscript.ScriptGroup;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,9 +30,16 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.chip.ChipGroup;
+import com.kakao.auth.ApprovalType;
+import com.kakao.auth.AuthType;
+import com.kakao.auth.IApplicationConfig;
+import com.kakao.auth.ISessionConfig;
+import com.kakao.auth.KakaoAdapter;
+import com.kakao.auth.KakaoSDK;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,8 +53,20 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.kakao.auth.ApiErrorCode;
+import com.kakao.auth.ISessionCallback;
+import com.kakao.auth.Session;
+import com.kakao.network.ErrorResult;
+import com.kakao.usermgmt.LoginButton;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.MeV2ResponseCallback;
+import com.kakao.usermgmt.response.MeV2Response;
+import com.kakao.util.OptionalBoolean;
+import com.kakao.util.exception.KakaoException;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -52,6 +79,7 @@ public class LoginActivity extends AppCompatActivity {
     private static String TAG_e_mail = "이메일";
     private static String TAG_JSON = "JSON";
 
+    private SessionCallback sessionCallback;
     private TextView mTextViewResult;
 
     Intent login_intent;
@@ -70,12 +98,15 @@ public class LoginActivity extends AppCompatActivity {
     String errorString;
     String loginid, loginpwd;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         String result;
+
+
 
         login_intent = new Intent(this, MainActivity.class);
         sign_intent = new Intent(this, sign_up.class);
@@ -92,6 +123,11 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences auto = getSharedPreferences("auto", Activity.MODE_PRIVATE);
         loginid = auto.getString("inputId", null);
         loginpwd = auto.getString("inputPWD", null);
+
+        sessionCallback = new SessionCallback();
+        Session.getCurrentSession().addCallback(sessionCallback);
+        Session.getCurrentSession().checkAndImplicitOpen();
+
 
 
         if(loginid !=null && loginpwd !=null || loginid == "ID" && loginpwd =="PWD") {
@@ -135,6 +171,18 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(Session.getCurrentSession().handleActivityResult(requestCode,resultCode,data)) {
+            super.onActivityResult(requestCode,resultCode,data);
+            return;
+        }
+    }
+
+    protected void onDestroy(){
+        super.onDestroy();
+        Session.getCurrentSession().removeCallback(sessionCallback);
     }
 
 
@@ -277,9 +325,48 @@ public class LoginActivity extends AppCompatActivity {
             toast.cancel();
         }
     }
+    private class SessionCallback implements ISessionCallback {
+        @Override
+        public void onSessionOpened() {
+            UserManagement.getInstance().me(new MeV2ResponseCallback() {
+                @Override
+                public void onFailure(ErrorResult errorResult) {
+                    int result = errorResult.getErrorCode();
+
+                    if (result == ApiErrorCode.CLIENT_ERROR_CODE) {
+                        Toast.makeText(getApplicationContext(), "네트워크 연결이 불안정합니다. 다시 시도해 주세요.", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "로그인 도중 오류가 발생했습니다: " + errorResult.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                public void onSessionClosed(ErrorResult errorResult) {
+                    Toast.makeText(getApplicationContext(), "세션이 닫혔습니다. 다시 시도해 주세요: " + errorResult.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                }
 
 
-}
+                @Override
+                public void onSuccess(MeV2Response result) {
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.putExtra("name", result.getNickname());
+                    intent.putExtra("profile", result.getProfileImagePath());
+                    intent.putExtra("account_email", result.getKakaoAccount().getEmail());
+
+                    startActivity(intent);
+                    LoginActivity.this.finish();
+                }
+            });
+        }
+
+        @Override
+        public void onSessionOpenFailed(KakaoException e) {
+            Toast.makeText(getApplicationContext(), "로그인 도중 오류가 발생했습니다. 인터넷 연결을 확인해주세요: "+e.toString(), Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+    }
 
 
 

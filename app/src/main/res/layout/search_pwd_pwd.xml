@@ -44,7 +44,7 @@
     android:textSize="20dp"
         ></TextView>
 
-    <EditText android:id="@+id/chaging_pwd"
+    <EditText android:id="@+id/changing_pwd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/search_Result_pwd"
@@ -57,7 +57,7 @@
     <Button android:id="@+id/chage_pwd_bt"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/chaging_pwd"
+        android:layout_below="@id/changing_pwd"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:textSize="25dp"

@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
 
+
     <ImageView android:id="@+id/logo_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -59,7 +60,7 @@
         android:layout_height="50dp"
         android:layout_below="@id/auto_login"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="10dp"
         android:text="로그인"
         ></Button>
 
@@ -83,4 +84,14 @@
         android:textSize="15dp"
         android:text="아이디/비빌번호\n          찾기"
         ></TextView>
+
+
+
+        <com.kakao.usermgmt.LoginButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/login_bt"
+            android:layout_centerHorizontal="true"
+            tools:ignore="MissingConstraints"></com.kakao.usermgmt.LoginButton>
+
 </RelativeLayout>

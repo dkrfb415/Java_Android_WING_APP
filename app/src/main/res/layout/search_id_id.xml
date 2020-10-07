@@ -3,11 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <EditText android:id="@+id/id_search_re"
+    <EditText android:id="@+id/name_search_re"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="150dp"
-        android:hint="ID"
+        android:hint="Name"
         android:gravity="center"
         android:textSize="20dp"
         >
@@ -16,7 +16,7 @@
     <EditText android:id="@+id/phone_num_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/id_search_re"
+        android:layout_below="@id/name_search_re"
         android:layout_marginTop="30dp"
         android:hint="Phone Num"
         android:textSize="20dp"

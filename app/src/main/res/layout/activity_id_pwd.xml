@@ -39,10 +39,11 @@
             ></Button>
     </LinearLayout>
 
-<FrameLayout android:id="@+id/main_frame"
+<FrameLayout android:id="@+id/id_pwd_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    ></FrameLayout>
+    >
+</FrameLayout>
 
 
 </LinearLayout>
